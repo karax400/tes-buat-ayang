@@ -2,28 +2,25 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>CBT TPA Offline (200 Soal)</title>
+<title>CBT TPA CYBER</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <style>
 body{
-  font-family:Arial;
-  background: linear-gradient(-45deg, #1e3a8a, #9333ea, #06b6d4, #22c55e);
-  background-size: 400% 400%;
-  animation: gradient 12s ease infinite;
+  font-family:'Segoe UI',sans-serif;
+  margin:0;
   color:#e5e7eb;
-}
-
-@keyframes gradient{
-  0%{background-position:0% 50%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 50%;}
+  background:url('bg.jpg') no-repeat center center fixed;
+  background-size:cover;
 }
 
 body::before{
   content:'';
   position:fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  background:rgba(0,0,0,0.6);
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.7);
   z-index:-1;
 }
 
@@ -31,127 +28,232 @@ body::before{
   max-width:1000px;
   margin:auto;
   padding:20px;
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(12px);
-  border-radius: 16px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+  border-radius:20px;
+  background:rgba(10,15,30,0.7);
+  backdrop-filter:blur(20px);
+  box-shadow:0 0 30px #00ffff;
 }
 
-.question{display:none;margin-top:20px}
+h2{
+  text-align:center;
+  color:#00ffff;
+  text-shadow:0 0 10px #00ffff;
+}
 
-button{
-  padding:8px 12px;
+/* BUTTON */
+.cyber-btn{
+  padding:10px 14px;
   margin:4px;
   border:none;
-  border-radius:6px;
+  border-radius:10px;
+  background:#0f172a;
+  color:#00ffff;
   cursor:pointer;
-  transition:0.2s;
 }
 
-button:hover{
-  transform: scale(1.05);
-  opacity:0.9;
+.cyber-btn:hover{
+  transform:scale(1.1);
+  color:white;
+  box-shadow:0 0 10px #00ffff;
 }
 
-.nav button{margin:2px;background:#1f2937;color:white}
-.submit{background:#3b82f6;color:white}
-.timer{color:#f87171;font-size:18px}
+/* progress */
+.progress{
+  height:10px;
+  background:#1f2937;
+  border-radius:10px;
+  margin:10px 0;
+}
+.progress-bar{
+  height:100%;
+  width:0%;
+  background:cyan;
+}
+
+/* soal */
+.question{display:none;margin-top:20px}
+
+.slider{width:200px}
 </style>
 </head>
+
 <body>
+
+<audio id="bgm" loop></audio>
+
 <div class="container">
-<h2>CBT TPA Pascasarjana (200 Soal Bank)</h2>
-<p class="timer">Waktu: <span id="time">90:00</span></p>
+<h2>CBT TPA</h2>
+<p>Waktu: <span id="time">90:00</span></p>
+
+<!-- CONTROL -->
+<div>
+  <button type="button" class="cyber-btn" onclick="playMusic()"><i class="fa-solid fa-play"></i></button>
+  <button type="button" class="cyber-btn" onclick="pauseMusic()"><i class="fa-solid fa-pause"></i></button>
+  <button type="button" class="cyber-btn" onclick="prevTrack()"><i class="fa-solid fa-backward"></i></button>
+  <button type="button" class="cyber-btn" onclick="nextTrack()"><i class="fa-solid fa-forward"></i></button>
+
+  <br>
+  Volume:
+  <input type="range" min="0" max="1" step="0.01"
+  class="slider" oninput="setVolume(this.value)">
+
+  <div id="nowPlaying"></div>
+</div>
+
+<div class="progress">
+  <div class="progress-bar" id="progressBar"></div>
+</div>
+
 <div id="nav"></div>
 <form id="quiz"></form>
-<button class="submit" onclick="finish()">Selesai</button>
+
+<button type="button" class="cyber-btn" onclick="prevQuestion()">Prev</button>
+<button type="button" class="cyber-btn" onclick="nextQuestion()">Next</button>
+<button type="button" class="cyber-btn" onclick="finish()">Selesai</button>
+
 <p id="result"></p>
 </div>
 
 <script>
-// === GENERATE BANK SOAL TPA ===
-const bank = [];
+// ===== MUSIC FIX =====
+const playlist=["kicau.mp3","tia.mp3"];
+let currentTrack=0;
+const bgm=document.getElementById("bgm");
+
+function loadTrack(i){
+  bgm.src=playlist[i];
+  bgm.load();
+  document.getElementById("nowPlaying").innerText="Now Playing: "+playlist[i];
+}
+
+function playMusic(){ bgm.play().catch(()=>alert("Klik dulu layar")); }
+function pauseMusic(){ bgm.pause(); }
+
+function nextTrack(){
+  currentTrack=(currentTrack+1)%playlist.length;
+  loadTrack(currentTrack);
+  bgm.play();
+}
+
+function prevTrack(){
+  currentTrack=(currentTrack-1+playlist.length)%playlist.length;
+  loadTrack(currentTrack);
+  bgm.play();
+}
+
+function setVolume(v){ bgm.volume=v; }
+
+// wajib klik dulu (browser rule)
+document.body.addEventListener("click",()=>{
+  bgm.play().catch(()=>{});
+},{once:true});
+
+bgm.addEventListener("ended",nextTrack);
+loadTrack(currentTrack);
+
+// ===== GENERATE 100 SOAL =====
+const bank=[];
 
 // VERBAL
-const sinonim = [
-["abstrak","tidak nyata"],["konkret","nyata"],["efisien","tepat guna"],["ambigu","ganda"]
+const sinonim=[
+["abstrak","tidak nyata"],
+["efisien","tepat guna"],
+["ambigu","bermakna ganda"]
 ];
-for(let i=0;i<70;i++){
+
+for(let i=0;i<30;i++){
  let s=sinonim[i%sinonim.length];
  bank.push({
   q:`Sinonim dari "${s[0]}" adalah...`,
-  options:[s[1],"tidak jelas","rumit","berbeda"],
+  options:[s[1],"sulit","besar","asing"],
   answer:"A"
  });
 }
 
-// KUANTITATIF
-for(let i=1;i<=70;i++){
+// NUMERIK
+for(let i=1;i<=35;i++){
  let a=i+2,b=i*2;
  bank.push({
-  q:`Jika x=${a}, y=${b}, maka x+y=?`,
+  q:`Jika x=${a} dan y=${b}, maka x+y=?`,
   options:[`${a+b}`,`${a*b}`,`${b-a}`,`${a}`],
   answer:"A"
  });
 }
 
 // LOGIKA
-for(let i=0;i<60;i++){
+for(let i=0;i<35;i++){
  bank.push({
-  q:`Semua A adalah B. Semua B adalah C. Maka...`,
+  q:`Semua A adalah B, semua B adalah C. Maka...`,
   options:["Semua A adalah C","Sebagian C adalah A","Tidak dapat disimpulkan","Semua C adalah A"],
   answer:"A"
  });
 }
 
-// === RANDOM 100 SOAL ===
-let questions = bank.sort(()=>0.5-Math.random()).slice(0,100);
-
+// ===== RENDER =====
 const quiz=document.getElementById('quiz');
 const nav=document.getElementById('nav');
 
-questions.forEach((item,i)=>{
+bank.forEach((item,i)=>{
  let div=document.createElement('div');
  div.className='question';
  div.id='q'+i;
+
  div.innerHTML=`<p>${i+1}. ${item.q}</p>`+
  item.options.map((opt,idx)=>{
   let label=String.fromCharCode(65+idx);
   return `<label><input type='radio' name='q${i}' value='${label}'> ${label}. ${opt}</label><br>`;
  }).join('');
+
  quiz.appendChild(div);
 
  let btn=document.createElement('button');
  btn.textContent=i+1;
- btn.onclick=(e)=>{e.preventDefault();show(i)};
+ btn.className="cyber-btn";
+ btn.type="button";
+ btn.onclick=()=>show(i);
  nav.appendChild(btn);
 });
 
+let current=0;
+
 function show(i){
+ current=i;
  document.querySelectorAll('.question').forEach(q=>q.style.display='none');
  document.getElementById('q'+i).style.display='block';
-}
-show(0);
 
+ document.getElementById('progressBar').style.width=
+ ((i+1)/bank.length*100)+"%";
+}
+
+function nextQuestion(){ if(current<bank.length-1) show(current+1); }
+function prevQuestion(){ if(current>0) show(current-1); }
+
+// ===== SCORING BENAR =====
 function finish(){
  let score=0;
- questions.forEach((q,i)=>{
+
+ bank.forEach((q,i)=>{
   let ans=document.querySelector(`input[name=q${i}]:checked`);
   if(ans && ans.value===q.answer) score++;
  });
- let tpaScore = Math.round((score/questions.length)*800);
- document.getElementById('result').innerText=`Benar: ${score}/${questions.length} | Skor TPA: ${tpaScore}`;
+
+ document.getElementById('result').innerText=
+ "Skor: "+score+"/"+bank.length;
 }
 
-// TIMER 90 MENIT
+show(0);
+
+// ===== TIMER =====
 let time=5400;
 setInterval(()=>{
  if(time>0){
   time--;
   let m=Math.floor(time/60),s=time%60;
-  document.getElementById('time').innerText=`${m}:${s<10?'0'+s:s}`;
- } else finish();
+  document.getElementById('time').innerText=
+  `${m}:${s<10?'0'+s:s}`;
+ }
 },1000);
+
 </script>
 </body>
 </html>
